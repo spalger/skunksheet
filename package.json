@@ -2,10 +2,10 @@
   "name": "skunksheet",
   "private": true,
   "version": "0.0.0",
-  "main": "src/app.js",
+  "main": "target/server/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --hot --inline"
+    "start": "NODE_ENV=development nodemon target/server/server.js",
+    "dev": "rm -rf target/{client,server} && webpack --watch"
   },
   "devDependencies": {
     "@spalger/babel-presets": "0.0.1",
@@ -27,13 +27,17 @@
     "less-loader": "^2.2.3",
     "postcss-loader": "^0.9.1",
     "raw-loader": "^0.5.1",
+    "source-map-support": "^0.4.0",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
+    "@horizon/server": "^1.0.3",
     "angular": "^1.5.5",
-    "angular-route": "^1.5.5"
+    "angular-route": "^1.5.5",
+    "express": "^4.13.4",
+    "horizon": "^1.0.3"
   }
 }

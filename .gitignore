@@ -1,2 +1,5 @@
 node_modules
 target
+rethinkdb_data
+.hz/config.dev.toml
+*.log
