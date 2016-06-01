@@ -1,6 +1,12 @@
 const res = require('path').resolve.bind(null, __dirname)
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const readdir = require('fs').readdirSync
+const pkg = require('./package')
+
+const externals = [
+  'horizon/src/serve',
+  ...Object.keys(pkg.dependencies || {}),
+  ...Object.keys(pkg.devDependencies || {}),
+]
 
 const devtool = 'cheap-module-source-map'
 function jsLoaders() {
@@ -24,12 +30,6 @@ function resolve() {
   }
 }
 
-function resolveLoader() {
-  return {
-    moduleTemplates: ['*'],
-  }
-}
-
 module.exports = [
   // client
   {
@@ -48,7 +48,6 @@ module.exports = [
     },
 
     resolve: resolve(),
-    resolveLoader: resolveLoader(),
     module: {
       loaders: [
         jsLoaders(),
@@ -102,9 +101,7 @@ module.exports = [
       libraryTarget: 'commonjs2',
       devtoolModuleFilenameTemplate: '[resource-path]',
     },
-    externals: [
-      ...readdir(res('node_modules')).filter(n => !n.startsWith('.')),
-    ],
+    externals,
 
     node: {
       console: false,
@@ -117,7 +114,6 @@ module.exports = [
     },
 
     resolve: resolve(),
-    resolveLoader: resolveLoader(),
     module: {
       loaders: [
         jsLoaders(),
