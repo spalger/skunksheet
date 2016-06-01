@@ -1,3 +1,8 @@
 ---
 
 extends: "@spalger/personal/es6"
+rules:
+  no-loop-func: off
+  no-param-reassign: off
+  import/named: error
+  no-underscore-dangle: off

@@ -1,0 +1,1 @@
+export { setupIssueSync } from './setup'
