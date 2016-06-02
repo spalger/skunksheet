@@ -84,6 +84,20 @@ attempt(async function main() {
     })(req, res, next)
   })
 
+  // serve the client bundle output
+  app.use(express.static(rel(config.serve_static)))
+
+  // enable "html5" style routing
+  app.use((req, res, next) => {
+    if (req.url.match(/^\/(auth|horizon)\//)) {
+      logger.debug('ignoring request for', req.url)
+      next()
+    } else {
+      logger.debug('sending index.html')
+      res.sendFile(rel(config.serve_static, 'index.html'))
+    }
+  })
+
   const server = createServer(rel, config)
     .on('request', app)
     .listen(8181)
@@ -104,19 +118,7 @@ attempt(async function main() {
     },
   })
 
-  // hzServer.add_auth_provider(Horizon.auth.github, {
-  //   path: 'github',
-  //   id: process.env.GITHUB_APP_ID,
-  //   secret: process.env.GITHUB_APP_SECRET,
-  // })
-
   await hzServer.ready()
-
-  // serve the client bundle output
-  app.use(express.static(rel(config.serve_static)))
-  app.all((req, res) => {
-    res.send(rel(config.serve_static, 'index.html'))
-  })
 
   process.stdout.write('listening on port 8181\n')
 })
