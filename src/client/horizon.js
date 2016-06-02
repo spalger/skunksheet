@@ -1,9 +1,9 @@
 import angular from 'angular'
 import Horizon from '@horizon/client'
 
-angular.module('Skunk.horizon', [])
+angular.module('Skunk.horizon', ['Skunk.auth'])
 
-.factory('horizonSetup', $location => {
+.factory('horizonSetup', ($location, auth) => {
   const horizon = new Horizon({ secure: true, authType: 'token' })
   const { authOutcome } = $location.search()
 
@@ -23,8 +23,8 @@ angular.module('Skunk.horizon', [])
 
   // we need to get authenticated
   if (!horizon.hasAuthToken()) {
-    window.location.pathname = '/auth/github'
-    return { ok: false, info: 'redirecting' }
+    auth.reauth()
+    return { ok: false, info: 'reauth' }
   }
 
   // already authenticated

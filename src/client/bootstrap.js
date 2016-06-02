@@ -21,7 +21,7 @@ angular.module('Skunk', ['ngRoute', 'Skunk.sheet', 'Skunk.app', 'Skunk.horizon']
           return horizonSetup.horizon
         }
 
-        if (horizonSetup.info === 'redirecting') {
+        if (horizonSetup.info === 'reauth') {
           return new Promise(() => {}) // don't resolve, this so that the redirect can take place
         }
 
