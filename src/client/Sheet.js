@@ -20,8 +20,6 @@ angular.module('Skunk.sheet', [
     <div ng-if="!sheet.loading">
       <ol>
         <li ng-repeat="issue in sheet.issues">
-          <button ng-click="sheet.deleteIssue(issue)">Delete</button>
-          <br>
           <pre>{{ issue | json }}</pre>
         </li>
       </ol>
@@ -32,9 +30,15 @@ angular.module('Skunk.sheet', [
   controllerAs: 'sheet',
   controller(horizon, $scope) {
     this.$onInit = () => {
-      $scope.$sub(horizon('issues').watch(), issues => {
-        this.issues = issues
-      })
+      $scope.$sub(
+        horizon('issues')
+          .limit(10)
+          .watch()
+        ,
+        issues => {
+          this.issues = issues
+        }
+      )
     }
 
     this.addIssue = () => {
