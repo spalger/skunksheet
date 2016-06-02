@@ -1,22 +1,16 @@
 /* eslint-disable no-underscore-dangle */
 import { logger } from '@horizon/server'
 import r from 'rethinkdb'
-import { once } from 'lodash'
-
-const getConnectionToInternal = once(config => r.connect({
-  host: config.rdb_host,
-  port: config.rdb_port,
-}))
+import { getConnectionToInternal } from './db'
 
 export async function getOrCreateInHorizon(config, hzServer, accessToken, refreshToken, profile) {
   const auth = hzServer._auth
 
   // stolen from auth#generate()
   const key = auth.auth_key('github', profile.id)
-  const internalDb = r.db(`${config.project_name}_internal`)
 
   const insert = (table, row) =>
-    internalDb.table(table)
+    r.table(table)
       .insert(row, { conflict: 'error', returnChanges: 'always' })
       .bracket('changes')(0)('new_val')
 

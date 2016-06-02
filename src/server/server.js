@@ -12,6 +12,7 @@ import passport from 'passport'
 import GitHubStrategy from 'passport-github2'
 
 import { getOrCreateInHorizon } from './auth'
+import { getLatestIssue } from './issues'
 
 if (process.argv.some(a => a === '--debug')) {
   logger.level = 'debug'
@@ -119,7 +120,17 @@ attempt(async function main() {
   })
 
   await hzServer.ready()
+  logger.info('listening on port 8181\n')
 
-  process.stdout.write('listening on port 8181\n')
+  attempt(async function sync() {
+    try {
+      logger.debug('synchronizing issues')
+      await getLatestIssue(config)
+    } catch (err) {
+      logger.error('synchronization failed', err)
+    } finally {
+      setTimeout(sync, 5000)
+    }
+  })
 })
 .done()

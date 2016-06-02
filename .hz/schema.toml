@@ -1,6 +1,7 @@
 [collections.issues]
 indexes = [
-  "org"
+  "id_updated\\_at",
+  "id_labels"
 ]
 
 [groups.default.rules.read_current_user]
