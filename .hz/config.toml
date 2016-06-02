@@ -5,8 +5,8 @@
 # 'bind' controls which local interfaces will be listened on
 # 'port' controls which port will be listened on
 #------------------------------------------------------------------------------
-# bind = [ "localhost" ]
-# port = 8181
+bind = [ "localhost" ]
+port = 8181
 
 
 ###############################################################################
@@ -15,8 +15,8 @@
 # 'key_file' and 'cert_file' are required for serving HTTPS
 #------------------------------------------------------------------------------
 # secure = false
-# key_file = "horizon-key.pem"
-# cert_file = "horizon-cert.pem"
+key_file = "src/dev_certs/server.key"
+cert_file = "src/dev_certs/server.crt"
 
 
 ###############################################################################
@@ -48,8 +48,8 @@ serve_static = "target/client"
 # 'connect' will connect to an existing RethinkDB instance
 # 'start_rethinkdb' will run an internal RethinkDB instance
 #------------------------------------------------------------------------------
-# connect = "localhost:28015"
-# start_rethinkdb = false
+connect = "localhost:28015"
+start_rethinkdb = false
 
 
 ###############################################################################
@@ -57,3 +57,39 @@ serve_static = "target/client"
 # 'debug' enables debug log statements
 #------------------------------------------------------------------------------
 # debug = true
+
+
+
+###############################################################################
+# Authentication Options
+# Each auth subsection will add an endpoint for authenticating through the
+# specified provider.
+# 'token_secret' is the key used to sign jwts
+# 'allow_anonymous' issues new accounts to users without an auth provider
+# 'allow_unauthenticated' allows connections that are not tied to a user id
+# 'auth_redirect' specifies where users will be redirected to after login
+#------------------------------------------------------------------------------
+# token_secret = "supersecret"
+# allow_anonymous = true
+# allow_unauthenticated = true
+# auth_redirect = "/"
+#
+# [auth.facebook]
+# id = "000000000000000"
+# secret = "00000000000000000000000000000000"
+#
+# [auth.google]
+# id = "00000000000-00000000000000000000000000000000.apps.googleusercontent.com"
+# secret = "000000000000000000000000"
+#
+# [auth.twitter]
+# id = "0000000000000000000000000"
+# secret = "00000000000000000000000000000000000000000000000000"
+#
+# [auth.github]
+# id = "0"
+# secret = "0"
+#
+# [auth.twitch]
+# id = "0000000000000000000000000000000"
+# secret = "0000000000000000000000000000000"

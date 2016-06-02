@@ -36,7 +36,7 @@ module.exports = [
     context: res('src/client'),
     entry: [
       'babel-polyfill',
-      './App.js',
+      './bootstrap.js',
     ],
 
     devtool,

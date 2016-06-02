@@ -1,17 +1,20 @@
 import angular from 'angular'
 import 'angular-route'
-import './Sheet'
-import Horizon from '@horizon/client'
+import './sheet'
 
-angular.module('ShunkApp', ['ngRoute', 'ShunkApp.Sheet'])
+angular.module('Skunk.app', ['ngRoute', 'Skunk.sheet'])
 
-.service('horizon', () => new Horizon())
-
-// setup routing
-.config(($locationProvider, $routeProvider) => {
-  $routeProvider
-  .when('/', {
-    template: '<shunk-sheet></shunk-sheet>',
-  })
-  .otherwise('/')
+.component('skunkApp', {
+  template: `
+    <p>Hi, {{ skunk.user.profile.login }}</p>
+    <ng-view></ng-view>
+  `,
+  controllerAs: 'skunk',
+  controller: class SkunkController {
+    constructor($scope, horizon) {
+      $scope.$sub(horizon.currentUser().watch(), user => {
+        this.user = user
+      })
+    }
+  },
 })

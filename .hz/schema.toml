@@ -1,0 +1,13 @@
+[collections.issues]
+indexes = [
+  "org"
+]
+
+[groups.default.rules.read_current_user]
+template = "collection('users').anyRead()"
+
+[groups.default.rules.read_all_issues]
+template = "collection('issues').anyRead()"
+
+[groups.default.rules.write_all_issues]
+template = "collection('issues').anyWrite()"
