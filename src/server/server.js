@@ -12,7 +12,7 @@ import passport from 'passport'
 import GitHubStrategy from 'passport-github2'
 
 import { getOrCreateInHorizon } from './auth'
-import { getLatestIssue } from './issues'
+import { getLatestIssues } from './issues'
 
 if (process.argv.some(a => a === '--debug')) {
   logger.level = 'debug'
@@ -125,7 +125,7 @@ attempt(async function main() {
   attempt(async function sync() {
     try {
       logger.debug('synchronizing issues')
-      await getLatestIssue(config)
+      await getLatestIssues(config)
     } catch (err) {
       logger.error('synchronization failed', err)
     } finally {

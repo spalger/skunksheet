@@ -1,0 +1,1 @@
+export { getLatestIssues } from './sync'
