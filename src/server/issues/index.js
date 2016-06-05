@@ -1,1 +1,1 @@
-export { getLatestIssues } from './sync'
+export { setupIssueSync } from './setup'

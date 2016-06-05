@@ -1,5 +1,4 @@
 import parseLinkHeader from 'parse-link-header'
-import { logger } from '@horizon/server'
 import axios from 'axios'
 import { format as formatUrl } from 'url'
 import { get, omitBy, isNil } from 'lodash'
@@ -12,15 +11,15 @@ const secsFromNow = unixts => {
   return sec.toFixed(2)
 }
 
-export const getIssues = async ({ page, etag }) => {
-  logger.debug('fetching page %d', page)
+export const getIssues = async ({ app, page, etag }) => {
+  app.log.debug('fetching page %d', page)
 
   const { data, status, headers } = await axios.request({
     method: 'GET',
     url: formatUrl({
       protocol: 'https:',
       hostname: 'api.github.com',
-      pathname: '/repos/elastic/cloud/issues',
+      pathname: `/repos/${app.config('repo.org')}/${app.config('repo.name')}/issues`,
       query: {
         page,
         per_page: 100,
@@ -32,14 +31,14 @@ export const getIssues = async ({ page, etag }) => {
     headers: cleanKeys({
       'If-None-Match': etag,
       'User-Agent': 'hub-cap/skunksheet',
-      Authorization: `token ${process.env.SERVER_GITHUB_ACCOUNT_TOKEN}`,
+      Authorization: `token ${app.config('github.botAccountToken')}`,
     }),
 
     maxContentLength: Infinity,
     validateStatus: () => true,
   })
 
-  logger.debug(
+  app.log.debug(
 `github rate limit:
   remaining: ${headers['x-ratelimit-remaining']}
   limit:     ${headers['x-ratelimit-limit']}
@@ -61,14 +60,6 @@ export const getIssues = async ({ page, etag }) => {
   }
 
   throw new Error(
-`Unexpected response from Github:
-
-  ${
-    JSON.stringify({ status, headers, data }, null, '  ')
-      .split('\n')
-      .join('\n  ')
-  }
-
-`
+    `Unexpected response from Github: ${JSON.stringify({ status, headers, data }, null, '  ')}`
   )
 }

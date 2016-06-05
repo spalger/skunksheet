@@ -32,7 +32,7 @@ angular.module('Skunk.sheet', [
     this.$onInit = () => {
       $scope.$sub(
         horizon('issues')
-          .limit(10)
+          .findAll({ state: 'open' })
           .watch()
         ,
         issues => {

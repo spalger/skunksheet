@@ -1,41 +1,80 @@
-import { logger } from '@horizon/server'
-import r from 'rethinkdb'
-import partial from 'lodash/partial'
+import { delay } from 'bluebird'
+import { partial, flatten } from 'lodash'
 
-import { getConnection, getConnectionToInternal } from '../db'
+import { getClient } from '../es'
 
-const getIssueTable = async config =>
-  await r.table('collections')
-    .get('issues')
-    .bracket('table')
-    .run(await getConnectionToInternal(config))
+const $$ = new WeakMap()
 
+export const getSyncContext = async app => {
+  const es = await getClient(app)
+  const resp = await es.search({
+    index: 'issues',
+    type: 'issue',
+    ignore: [404],
+    body: {
+      sort: [
+        { updated_at: 'desc' },
+      ],
+      size: 1,
+      _source: 'context.*',
+    },
+  })
 
-export const getSyncContext = async (conn, table) =>
-  await r.table(table)
-    .orderBy({ index: r.desc('updated_at') })
-    .nth(0)
-    .bracket('context')
-    .default(null)
-    .run(conn)
+  if (!resp.hits || !resp.hits.total) {
+    return null
+  }
 
-
-export const saveIssuesWithContext = async (conn, table, { context, issues }) => {
-  logger.info(`saving issues with context ${JSON.stringify(context)}`)
-
-  await r.table(table)
-    .insert(issues.map(i => ({ ...i, context })), { conflict: 'replace' })
-    .run(conn)
+  return resp.hits.hits[0]._source.context
 }
 
-export const createDb = async (config) => {
-  const [conn, table] = await Promise.all([
-    getConnection(config),
-    getIssueTable(config),
-  ])
+export const saveIssuesWithContext = async (app, { context, issues }) => {
+  app.log.info('saving %d issues with context %j', issues.length, context)
 
-  return {
-    getSyncContext: partial(getSyncContext, conn, table),
-    saveIssuesWithContext: partial(saveIssuesWithContext, conn, table),
+  const es = await getClient(app)
+  const queue = issues.slice(0)
+  let attempts = 0
+
+  while (queue.length) {
+    if (attempts >= 5) {
+      throw new Error(
+        `Tried to index events ${attempts} times and still have ${queue.length} unindexed documents`
+      )
+    }
+
+    if (attempts > 0) {
+      // wait a couple seconds, elasticsearch could be coming back
+      await delay(2000)
+    }
+
+    attempts += 1
+    const sent = queue.splice(0)
+    const resp = await es.bulk({
+      index: 'issues',
+      body: flatten(sent.map(issue => [
+        { index: { _id: issue.id, _type: issue.pull_request ? 'pull' : 'issue' } },
+        { ...issue, context },
+      ])),
+    })
+
+    if (resp.errors) {
+      resp.items.forEach((item, i) => {
+        if (!item.error) return
+        app.log.warning('Unable to index update to document issues/issue/%s', item.id, item.error)
+        queue.push(sent[i])
+      })
+    }
   }
+}
+
+export const createDb = async app => ({
+  getSyncContext: partial(getSyncContext, app),
+  saveIssuesWithContext: partial(saveIssuesWithContext, app),
+})
+
+export const getDb = async app => {
+  if (!$$.has(app)) {
+    $$.set(app, createDb(app))
+  }
+
+  return await $$.get(app)
 }
