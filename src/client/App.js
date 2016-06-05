@@ -3,10 +3,10 @@ import 'angular-route'
 import { size } from 'lodash'
 
 import './auth'
-import './sheet'
+import './Sheet'
 import './notify'
 
-angular.module('Skunk.app', ['ngRoute', 'Skunk.sheet', 'Skunk.notify'])
+angular.module('Skunk.app', ['ngRoute', 'Skunk.sheet', 'Skunk.notify', 'Skunk.auth'])
 
 .component('skunkApp', {
   template: `
@@ -26,7 +26,7 @@ angular.module('Skunk.app', ['ngRoute', 'Skunk.sheet', 'Skunk.notify'])
   `,
   controllerAs: 'skunk',
   controller: class SkunkController {
-    constructor($scope, horizon, auth, notify) {
+    constructor($scope, auth, notify) {
       $scope.$watch(() => notify.fatalErrors, fatals => {
         this.fatalErrors = size(fatals) ? fatals : null
       })
@@ -34,20 +34,6 @@ angular.module('Skunk.app', ['ngRoute', 'Skunk.sheet', 'Skunk.notify'])
       $scope.$watch(() => notify.messages, messages => {
         this.messages = size(messages) ? messages : null
       })
-
-      $scope.$sub(
-        horizon.currentUser().watch(),
-        user => {
-          this.user = user
-        },
-        error => {
-          if (error.message.includes('User account has been deleted')) {
-            auth.reauth()
-          } else {
-            notify.fatal(error)
-          }
-        }
-      )
     }
   },
 })

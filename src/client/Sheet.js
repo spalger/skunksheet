@@ -1,9 +1,6 @@
 import angular from 'angular'
-import './horizon'
 
-angular.module('Skunk.sheet', [
-  'Skunk.horizon',
-])
+angular.module('Skunk.sheet', [])
 
 .component('skunkSheet', {
   template: `
@@ -28,39 +25,16 @@ angular.module('Skunk.sheet', [
   `,
 
   controllerAs: 'sheet',
-  controller(horizon, $scope) {
+  controller() {
     this.$onInit = () => {
-      $scope.$sub(
-        horizon('issues')
-          .findAll({ state: 'open' })
-          .watch()
-        ,
-        issues => {
-          this.issues = issues
-        }
-      )
     }
 
     this.addIssue = () => {
-      horizon('issues').store(this.pendingIssue)
       this.pendingIssue = {}
     }
 
     this.deleteIssue = issue => {
-      horizon('issues').remove(issue.id)
     }
-
-    // this.getCurrentVersionIssues = version => {
-    //   this.loading = true
-    //
-    //   const url = `https://api.github.com/repos/hub-cap/skunksheet/issues?labels=version:${version}`
-    //   $http.get(url)
-    //   .then(response => this.formatIssueResponse(response))
-    //   .then(issues => {
-    //     this.loading = false
-    //     this.issues = issues
-    //   })
-    // }
 
     this.formatIssueResponse = (response) => response.data.map(issue => {
       const isInProgress = issue.labels.some(l => l.name === 'in progress')
