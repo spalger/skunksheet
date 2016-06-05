@@ -3,11 +3,13 @@ import { getGithubApi, stripExtraUrls } from '../github'
 import { getClient } from '../es'
 import { Boom } from 'boom'
 
-export const saveAccess = async (app, access) => {
+export const createOrUpdateAccess = async (app, access) => {
   const es = getClient(app)
+
   const resp = await es.index({
     index: 'access',
     type: 'grant',
+    id: access.user.id,
     body: access,
   })
 
@@ -44,7 +46,7 @@ export const getAccessForGHAccessToken = async (app, accessToken) => {
 
   access.user = stripExtraUrls(user)
   access.user.orgs = orgs.map(stripExtraUrls)
-  access.id = await saveAccess(app, access)
+  access.id = await createOrUpdateAccess(app, access)
 
   app.log.debug('New access granted:', access)
 
