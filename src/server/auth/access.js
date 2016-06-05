@@ -1,7 +1,9 @@
+import jsonwebtoken from 'jsonwebtoken'
+import { Boom } from 'boom'
+import { fromNode as fn } from 'bluebird'
 
 import { getGithubApi, stripExtraUrls } from '../github'
 import { getClient } from '../es'
-import { Boom } from 'boom'
 
 export const createOrUpdateAccess = async (app, access) => {
   const es = getClient(app)
@@ -10,10 +12,27 @@ export const createOrUpdateAccess = async (app, access) => {
     index: 'access',
     type: 'grant',
     id: access.user.id,
-    body: access,
+    body: {
+      ...access,
+      id: access.user.id,
+    },
   })
 
   return resp._id
+}
+
+export const getJwtForAccess = async (app, access) => {
+  const payload = {
+    access_id: access.id,
+  }
+  const secret = app.config('jwt.secret')
+  const options = {
+    audience: app.getUri(),
+    issuer: app.config('jwt.issuer'),
+  }
+  return await fn(cb =>
+    jsonwebtoken.sign(payload, secret, options, cb)
+  )
 }
 
 export const getAccessFromJwt = async (app, jwt) => {

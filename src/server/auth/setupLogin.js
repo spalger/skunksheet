@@ -4,7 +4,7 @@ import { fromNode as fn } from 'bluebird'
 import Boom from 'boom'
 
 import { getAuthUrl, authCodeToAccessToken } from './oauth'
-import { getAccessForGHAccessToken } from './access'
+import { getAccessForGHAccessToken, getJwtForAccess } from './access'
 
 const getRandomString = async () =>
   (await fn(cb => randomBytes(16, cb))).toString('hex')
@@ -31,7 +31,21 @@ export const setupLogin = app => {
 
       const token = await authCodeToAccessToken(app, req.query.code)
       const access = await getAccessForGHAccessToken(app, token)
-      res.json(access)
+      const jwt = await getJwtForAccess(app, access)
+
+      res
+      .type('html')
+      .end(`
+        <!doctype html>
+        <html lang="en">
+        <head>
+          <script>
+            window.localStorage.setItem('jwt', ${JSON.stringify(jwt)});
+            window.location.href = ${JSON.stringify(app.getUri())};
+          </script>
+        </head>
+        </html>
+      `)
     },
   })
 }
