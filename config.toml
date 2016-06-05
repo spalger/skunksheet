@@ -1,5 +1,5 @@
 [server]
-host = "localhost"
+hostname = "localhost"
 port = 8181
 secure = true
 keyFile = "src/dev_certs/server.key"
@@ -12,7 +12,11 @@ name = "cloud"
 [es]
 uri = "https://elastic:password@ac09797ae4a1485db622c04ee7a99979.192.168.42.42.xip.io:9243/"
 
-[sessions]
+[jwt]
+secret = false
+issuer = "skunksheet"
+
+[session]
 secret = false
 
 [logging]

@@ -1,0 +1,52 @@
+
+import { getGithubApi, stripExtraUrls } from '../github'
+import { getClient } from '../es'
+import { Boom } from 'boom'
+
+export const saveAccess = async (app, access) => {
+  const es = getClient(app)
+  const resp = await es.index({
+    index: 'access',
+    type: 'grant',
+    body: access,
+  })
+
+  return resp._id
+}
+
+export const getAccessFromJwt = async (app, jwt) => {
+  throw Boom.notImplemented('getAccessFromJwt is not implemented yet')
+}
+
+export const getAccessForGHAccessToken = async (app, accessToken) => {
+  const api = getGithubApi(app)
+
+  const access = {
+    github: {
+      token: accessToken.access_token,
+      tokenType: accessToken.token_type,
+      scopes: accessToken.scope.split(/\s*,\s*/),
+    },
+  }
+
+  const [user, orgs] = await Promise.all([
+    api({
+      access,
+      pathname: '/user',
+      expect: 200,
+    }),
+    api({
+      access,
+      pathname: '/user/orgs',
+      expect: 200,
+    }),
+  ])
+
+  access.user = stripExtraUrls(user)
+  access.user.orgs = orgs.map(stripExtraUrls)
+  access.id = await saveAccess(app, access)
+
+  app.log.debug('New access granted:', access)
+
+  return access
+}

@@ -2,7 +2,8 @@ import Joi from 'joi'
 import { LOG_LEVELS } from '../log'
 
 export const configSchema = Joi
-  .object().keys({
+  .object()
+  .keys({
     es: Joi.object().keys({
       uri: Joi.string().uri(),
     }),
@@ -11,8 +12,16 @@ export const configSchema = Joi
       hostname: Joi.string().hostname().default('localhost'),
       port: Joi.number(),
       secure: Joi.boolean().default(true),
-      keyFile: Joi.string(),
-      certFile: Joi.string(),
+      keyFile: Joi.when('secure', {
+        is: true,
+        then: Joi.string(),
+        otherwise: Joi.any().forbidden(),
+      }),
+      certFile: Joi.when('secure', {
+        is: true,
+        then: Joi.string(),
+        otherwise: Joi.any().forbidden(),
+      }),
     }),
 
     logging: Joi.object().keys({
@@ -24,14 +33,19 @@ export const configSchema = Joi
       name: Joi.string(),
     }),
 
-    sessions: Joi.object().keys({
+    session: Joi.object().keys({
       secret: Joi.string(),
+    }),
+
+    jwt: Joi.object().keys({
+      secret: Joi.string(),
+      issuer: Joi.string().default('skunksheet'),
     }),
 
     github: Joi.object().keys({
       appId: Joi.string(),
       appSecret: Joi.string(),
       botAccountToken: Joi.string(),
-      callbackUrl: Joi.string(),
+      callbackPath: Joi.string(),
     }),
   })

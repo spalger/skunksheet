@@ -1,1 +1,1 @@
-export { createConfig } from './createConfig'
+export { Config } from './Config'
