@@ -8,10 +8,11 @@ import { setupSessions } from './sessions'
 import { setupPassport } from './auth'
 import { setupIssueSync } from './issues'
 
-process.chdir(resolve(__dirname, '../../'))
+const configPath = resolve('config.toml')
+process.chdir(resolve(__dirname, '../'))
 
 attempt(async function main() {
-  const app = new App()
+  const app = new App(configPath)
 
   setupSessions(app)
   setupPassport(app)

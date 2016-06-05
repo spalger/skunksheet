@@ -5,15 +5,15 @@ import { createLog } from '../log'
 import { resolve } from 'path'
 
 export class App {
-  constructor() {
+  constructor(configPath) {
     this.express = express()
-    this.config = createConfig('config.toml', process.env)
+    this.config = createConfig(configPath, process.env)
     this.log = createLog(this.config)
 
     this.log.debug('loaded config:', this.config())
 
     // serve the client bundle output
-    const publicDir = resolve(__dirname, '../../client')
+    const publicDir = resolve('client')
     this.express.use(express.static(publicDir))
 
     // enable "html5" style routing
@@ -23,7 +23,7 @@ export class App {
         next()
       } else {
         this.log.debug('sending index.html')
-        res.sendFile(resolve(publicDir, 'index.html'))
+        res.sendFile(resolve(publicDir, './index.html'))
       }
     })
   }
