@@ -1,0 +1,1 @@
+export { setupViews } from './setup'

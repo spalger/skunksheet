@@ -15,6 +15,7 @@
     "babel-eslint": "^6.0.4",
     "babel-loader": "^6.2.4",
     "babel-polyfill": "^6.9.0",
+    "copy-webpack-plugin": "^3.0.1",
     "css-loader": "^0.23.1",
     "eslint": "^2.10.2",
     "eslint-config-airbnb": "^9.0.1",
@@ -32,7 +33,8 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.1",
-    "webpack-dev-server": "^1.14.1"
+    "webpack-dev-server": "^1.14.1",
+    "webpack-manifest-plugin": "^1.0.1"
   },
   "dependencies": {
     "angular": "^1.5.5",
@@ -45,12 +47,14 @@
     "express": "^4.13.4",
     "joi": "^8.4.0",
     "jsonwebtoken": "^7.0.0",
+    "jwt-decode": "^2.0.1",
     "lodash": "^4.13.1",
     "nodemon": "^1.9.2",
     "parse-link-header": "^0.4.1",
     "passport": "^0.3.2",
     "passport-github2": "^0.1.10",
     "passport-jwt": "^2.0.0",
+    "pug": "^2.0.0-beta2",
     "rethinkdb": "^2.3.2",
     "simple-oauth2": "^0.7.0",
     "toml": "^2.3.0",

@@ -23,7 +23,8 @@ export const createOrUpdateAccess = async (app, access) => {
 
 export const getJwtForAccess = async (app, access) => {
   const payload = {
-    access_id: access.id,
+    accessId: access.id,
+    userLogin: access.user.login,
   }
   const secret = app.config('jwt.secret')
   const options = {

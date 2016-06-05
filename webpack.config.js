@@ -1,9 +1,9 @@
 const res = require('path').resolve.bind(null, __dirname)
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
 const pkg = require('./package')
 
 const externals = [
-  'horizon/src/serve',
   ...Object.keys(pkg.dependencies || {}),
   ...Object.keys(pkg.devDependencies || {}),
 ]
@@ -34,16 +34,18 @@ module.exports = [
   // client
   {
     context: res('src/client'),
-    entry: [
-      'babel-polyfill',
-      './bootstrap.js',
-    ],
+    entry: {
+      app: [
+        'babel-polyfill',
+        './bootstrap.js',
+      ],
+    },
 
     devtool,
     output: {
       path: res('target/client'),
       publicPath: '/',
-      filename: 'bundle.js',
+      filename: '[name].bundle.js',
       devtoolModuleFilenameTemplate: '[resource-path]',
     },
 
@@ -74,11 +76,8 @@ module.exports = [
     },
 
     plugins: [
-      new HtmlWebpackPlugin({
-        template: 'index.html',
-        inject: 'body',
-        cache: true,
-        showErrors: true,
+      new ManifestPlugin({
+        fileName: 'manifest.json',
       }),
     ],
   },
@@ -117,7 +116,14 @@ module.exports = [
     module: {
       loaders: [
         jsLoaders(),
+        { test: /\.(jade)$/, loader: 'file-loader' },
       ],
     },
+
+    plugins: [
+      new CopyPlugin([
+        { from: res('src/server/views/**/*.jade'), to: res('target/server/views') },
+      ]),
+    ],
   },
 ]

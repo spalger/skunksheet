@@ -18,6 +18,10 @@ angular.module('Skunk.notify', [])
     this.fatalErrors.push(this.toMsg(err))
   }
 
+  success(msg) {
+    this.messages.push(msg)
+  }
+
   warning(msg) {
     this.messages.push(msg)
   }
